@@ -1,0 +1,75 @@
+{
+  "name": "bharat-utils",
+  "version": "1.0.0",
+  "description": "Privacy-first toolkit for Indian apps: validate 14 ID types (Aadhaar, PAN, GSTIN, vehicle, UPI...), redact PII from text, Hindi amount-in-words, lakh/crore formatting, GST calculator, financial-year helpers and Express middleware. Zero dependencies.",
+  "main": "src/index.js",
+  "module": "index.mjs",
+  "types": "index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "import": "./index.mjs",
+      "require": "./src/index.js"
+    },
+    "./express": {
+      "types": "./express.d.ts",
+      "default": "./src/express.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "bin": {
+    "bharat-utils": "bin/cli.js"
+  },
+  "files": [
+    "src",
+    "bin",
+    "index.mjs",
+    "index.d.ts",
+    "express.d.ts",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "test": "node --test"
+  },
+  "keywords": [
+    "india",
+    "indian",
+    "aadhaar",
+    "pan",
+    "gstin",
+    "gst",
+    "ifsc",
+    "pincode",
+    "upi",
+    "vehicle-number",
+    "validation",
+    "validator",
+    "pii",
+    "redact",
+    "privacy",
+    "inr",
+    "rupee",
+    "lakh",
+    "crore",
+    "number-to-words",
+    "hindi",
+    "financial-year",
+    "express-middleware",
+    "kyc"
+  ],
+  "author": "Saransh Mittal <saranshmittal45@gmail.com>",
+  "license": "MIT",
+  "engines": {
+    "node": ">=16"
+  },
+  "sideEffects": false,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/saransh752/bharat-utils.git"
+  },
+  "bugs": {
+    "url": "https://github.com/saransh752/bharat-utils/issues"
+  },
+  "homepage": "https://github.com/saransh752/bharat-utils#readme"
+}
