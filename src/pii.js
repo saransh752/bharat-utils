@@ -59,14 +59,14 @@ const maskLast4 = (value) => maskKeepLast(value, 4);
 
 // Priority order matters: earlier types win when matches overlap.
 const DETECTORS = [
-  { type: 'gstin', re: /\b\d{2}[A-Z]{5}\d{4}[A-Z][1-9A-Z]Z[0-9A-Z]\b/gi, ok: isGSTIN, mask: maskLast4 },
+  { type: 'gstin', re: /(?<![A-Za-z0-9])\d{2}[A-Z]{5}\d{4}[A-Z][1-9A-Z]Z[0-9A-Z](?![A-Za-z0-9])/gi, ok: isGSTIN, mask: maskLast4 },
   { type: 'card', mask: maskCard },
-  { type: 'aadhaar', re: /\b[2-9]\d{3}[ -]?\d{4}[ -]?\d{4}\b/g, ok: isAadhaar, mask: maskLast4 },
-  { type: 'pan', re: /\b[A-Z]{5}\d{4}[A-Z]\b/gi, ok: isPAN, mask: maskLast4 },
+  { type: 'aadhaar', re: /(?<![A-Za-z0-9])[2-9]\d{3}[ -]?\d{4}[ -]?\d{4}(?![A-Za-z0-9])/g, ok: isAadhaar, mask: maskLast4 },
+  { type: 'pan', re: /(?<![A-Za-z0-9])[A-Z]{5}\d{4}[A-Z](?![A-Za-z0-9])/gi, ok: isPAN, mask: maskLast4 },
   { type: 'email', re: /(?<![A-Za-z0-9._%+-])[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/g, ok: () => true, mask: maskEmail },
   { type: 'upi', re: /(?<![A-Za-z0-9._%+-])[A-Za-z0-9._-]{2,256}@[A-Za-z][A-Za-z0-9]{1,63}(?![A-Za-z0-9])/g, ok: isUPI, mask: maskUPI },
-  { type: 'passport', re: /\b[A-Z]\d{7}\b/gi, ok: isPassport, mask: maskPassport },
-  { type: 'voterid', re: /\b[A-Z]{3}\d{7}\b/gi, ok: isVoterId, mask: maskVoterId },
+  { type: 'passport', re: /(?<![A-Za-z0-9])[A-Z]\d{7}(?![A-Za-z0-9])/gi, ok: isPassport, mask: maskPassport },
+  { type: 'voterid', re: /(?<![A-Za-z0-9])[A-Z]{3}\d{7}(?![A-Za-z0-9])/gi, ok: isVoterId, mask: maskVoterId },
   {
     type: 'bankaccount',
     re: /(?<![\p{L}\p{M}\p{N}_])(?:a\/c|acct|account|खाता)(?:[ \t]+(?:no\.?|number|संख्या))?[ \t]*(?:[:#-][ \t]*)?(\d{9,18})(?!\d)/giu,
@@ -75,7 +75,7 @@ const DETECTORS = [
     mask: maskBankAccount,
   },
   { type: 'mobile', re: /(?<!\d)(?:\+91[ -]?|91[ -]?|0)?[6-9]\d{4}[ -]?\d{5}(?!\d)/g, ok: isMobile, mask: maskLast4 },
-  { type: 'ifsc', re: /\b[A-Z]{4}0[A-Z0-9]{6}\b/gi, ok: isIFSC, mask: maskLast4 },
+  { type: 'ifsc', re: /(?<![A-Za-z0-9])[A-Z]{4}0[A-Z0-9]{6}(?![A-Za-z0-9])/gi, ok: isIFSC, mask: maskLast4 },
 ];
 
 /**

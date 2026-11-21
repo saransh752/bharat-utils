@@ -107,3 +107,20 @@ test('card detection checks windows of complete digit groups', () => {
     assert.strictEqual(b.redactPII(text, { types: ['card'] }), text);
   }
 });
+
+test('identifier boundaries allow underscores and reject adjacent alphanumerics', () => {
+  const cases = [
+    ['kyc_ABCPE1234F.pdf', 'kyc_XXXXXX234F.pdf', 'pan'],
+    ['pan_ABCPE1234F', 'pan_XXXXXX234F', 'pan'],
+    ['aadhaar_234567890124', 'aadhaar_XXXXXXXX0124', 'aadhaar'],
+    ['gst_27AAPFU0939F1ZV', 'gst_XXXXXXXXXXXF1ZV', 'gstin'],
+    ['passport_A1234567_copy', 'passport_XXXX4567_copy', 'passport'],
+    ['voter_ABC1234567_copy', 'voter_XXXXXX4567_copy', 'voterid'],
+    ['ifsc_SBIN0001234_copy', 'ifsc_XXXXXXX1234_copy', 'ifsc'],
+  ];
+  for (const [text, expected, type] of cases) {
+    assert.strictEqual(b.redactPII(text, { types: [type] }), expected);
+  }
+  const embedded = 'IDA1234567X XABCPE1234F ABCPE1234F7 A234567890124 27AAPFU0939F1ZVX';
+  assert.strictEqual(b.redactPII(embedded), embedded);
+});
