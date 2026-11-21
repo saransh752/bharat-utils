@@ -32,17 +32,39 @@ function validateData(input, schema, options = {}) {
     const entry = getEntry(spec.type);
     if (!entry) throw new Error(`Unknown type "${spec.type}" for field "${field}"`);
     const label = spec.label || entry[lang];
-    const value = data[field];
+    const value = Object.hasOwn(data, field) ? data[field] : undefined;
+    const override = typeof spec.message === 'string' ? spec.message : spec.message?.[lang];
+    const report = (kind, detail) => {
+      Object.defineProperty(errors, field, {
+        value: override ?? detail ?? message(kind, lang, label),
+        enumerable: true, writable: true, configurable: true,
+      });
+    };
 
     if (isEmpty(value)) {
-      if (spec.required !== false) errors[field] = message('required', lang, label);
+      if (spec.required !== false) report('required');
       continue;
     }
     if (typeof value === 'object' || !entry.test(value)) {
-      errors[field] = message('invalid', lang, label);
+      report('invalid');
       continue;
     }
-    clean[field] = entry.normalize(value);
+    const normalized = entry.normalize(value);
+    if (spec.custom) {
+      let verdict;
+      try {
+        verdict = spec.custom(value, normalized);
+      } catch {
+        verdict = false;
+      }
+      if (verdict !== true) {
+        report('invalid', typeof verdict === 'string' ? verdict : undefined);
+        continue;
+      }
+    }
+    Object.defineProperty(clean, field, {
+      value: normalized, enumerable: true, writable: true, configurable: true,
+    });
   }
 
   return { valid: Object.keys(errors).length === 0, errors, data: clean };

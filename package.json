@@ -15,7 +15,15 @@
       "types": "./express.d.ts",
       "default": "./src/express.js"
     },
-    "./package.json": "./package.json"
+    "./package.json": "./package.json",
+    "./fastify": {
+      "types": "./fastify.d.ts",
+      "default": "./src/fastify.js"
+    },
+    "./koa": {
+      "types": "./koa.d.ts",
+      "default": "./src/koa.js"
+    }
   },
   "bin": {
     "bharat-utils": "bin/cli.js"
@@ -27,7 +35,9 @@
     "index.d.ts",
     "express.d.ts",
     "README.md",
-    "LICENSE"
+    "LICENSE",
+    "fastify.d.ts",
+    "koa.d.ts"
   ],
   "scripts": {
     "test": "node --test"

@@ -54,4 +54,41 @@ function parseFinancialYear(label) {
   };
 }
 
-module.exports = { financialYear, parseFinancialYear };
+function quarterOf(date) {
+  return financialYear(date).quarter;
+}
+
+function isLeapFY(input) {
+  const fy = typeof input === 'string' && /^\d{4}-\d{2}$/.test(input.trim())
+    ? parseFinancialYear(input)
+    : financialYear(input);
+  if (!fy) throw new RangeError('Invalid financial year');
+  const year = fy.endYear;
+  return year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0);
+}
+
+// Indicative schedules. Verify with the official calendar before use.
+// Monthly GST filers and ordinary non-government TDS deductors.
+function dueDates(fyLabel, { type } = {}) {
+  const fy = parseFinancialYear(fyLabel);
+  if (!fy) throw new RangeError('Invalid financial year');
+  const year = fy.startYear;
+  switch (type) {
+    case 'gstr-1':
+    case 'gstr-3b':
+    case 'tds-deposit':
+      return Array.from({ length: 12 }, (_, i) => {
+        const day = type === 'gstr-1' ? 11 : type === 'gstr-3b' ? 20 : i === 11 ? 30 : 7;
+        return new Date(year, i + 4, day);
+      });
+    case 'tds-return':
+      return [new Date(year, 6, 31), new Date(year, 9, 31),
+        new Date(year + 1, 0, 31), new Date(year + 1, 4, 31)];
+    case 'advance-tax':
+      return [5, 8, 11, 14].map((month) => new Date(year, month, 15));
+    default:
+      throw new RangeError(`Unknown due date type "${type}"`);
+  }
+}
+
+module.exports = { financialYear, parseFinancialYear, quarterOf, isLeapFY, dueDates };

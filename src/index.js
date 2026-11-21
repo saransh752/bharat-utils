@@ -9,6 +9,7 @@ const vehicle = require('./vehicle');
 const bank = require('./bank');
 const pincode = require('./pincode');
 const currency = require('./currency');
+const tax = require('./tax');
 const hindi = require('./hindi');
 const fy = require('./fy');
 const mask = require('./mask');
@@ -29,6 +30,6 @@ function validate(type, value) {
 
 module.exports = {
   ...aadhaar, ...pan, ...gstin, ...contact, ...ids, ...vehicle, ...bank, ...pincode,
-  ...currency, ...hindi, ...fy, ...mask, ...pii,
+  ...currency, ...tax, ...hindi, ...fy, ...mask, ...pii,
   detectType, validateData, validate, SUPPORTED_TYPES: TYPES,
 };

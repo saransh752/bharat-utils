@@ -14,6 +14,10 @@ const { validateData } = require('./schema');
 function validateRequest(schema, options = {}) {
   const { source = 'body', lang = 'en' } = options;
   return function bharatValidate(req, res, next) {
+    if (req[source] === undefined) {
+      const hint = source === 'body' ? ' Install a body parser such as express.json() before validation.' : '';
+      return res.status(400).json({ error: `Missing request ${source}.${hint}`, errors: {} });
+    }
     const result = validateData(req[source], schema, { lang });
     if (!result.valid) {
       return res.status(400).json({ error: 'Validation failed', errors: result.errors });

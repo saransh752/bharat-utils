@@ -56,4 +56,15 @@ export const validateData = b.validateData;
 export const validate = b.validate;
 export const SUPPORTED_TYPES = b.SUPPORTED_TYPES;
 
+export const GST_RATES = b.GST_RATES;
+export const LEGACY_GST_RATES = b.LEGACY_GST_RATES;
+export const TDS_SECTIONS = b.TDS_SECTIONS;
+export const isHSN = b.isHSN;
+export const isSAC = b.isSAC;
+export const calculateTDS = b.calculateTDS;
+export const calculateIncomeTax = b.calculateIncomeTax;
+export const quarterOf = b.quarterOf;
+export const isLeapFY = b.isLeapFY;
+export const dueDates = b.dueDates;
+
 export default b;

@@ -2,6 +2,7 @@
 
 const { numberToWordsHindi, amountInWordsHindi } = require('./hindi');
 
+const languages = { mr: require('./lang/mr'), gu: require('./lang/gu'), ta: require('./lang/ta'), bn: require('./lang/bn') };
 const { roundTo, splitAmount } = require('./_num');
 
 function formatNumber(amount, decimals) {
@@ -87,6 +88,7 @@ function below1000(n) {
  * Integer to words in the Indian system. Pass { lang: 'hi' } for Hindi.
  */
 function numberToWords(value, options = {}) {
+  if (Object.hasOwn(languages, options.lang)) return languages[options.lang].numberToWords(value);
   if (options.lang === 'hi') return numberToWordsHindi(value, options);
   const num = Number(value);
   if (!Number.isFinite(num)) throw new RangeError('Number out of range');
@@ -113,6 +115,7 @@ function numberToWords(value, options = {}) {
  *   amountInWords(1250.5) -> "Rupees One Thousand Two Hundred Fifty and Fifty Paise Only"
  */
 function amountInWords(amount, options = {}) {
+  if (Object.hasOwn(languages, options.lang)) return languages[options.lang].amountInWords(amount);
   if (options.lang === 'hi') return amountInWordsHindi(amount, options);
   const n = Number(amount);
   if (!Number.isFinite(n)) throw new TypeError('amountInWords expects a finite number');

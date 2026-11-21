@@ -11,6 +11,7 @@ function roundTo(n, decimals) {
 
 function splitAmount(n) {
   const rounded = roundTo(Math.abs(n), 2);
+  if (rounded >= 1e21) return [rounded, 0];
   const [whole, fraction = ''] = rounded.toString().split('.');
   return [Number(whole), Number(fraction.padEnd(2, '0'))];
 }

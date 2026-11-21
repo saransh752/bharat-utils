@@ -3,7 +3,7 @@ export type ValidatableType =
   | 'voterid' | 'passport' | 'dl' | 'tan' | 'cin' | 'udyam' | 'upi';
 
 export interface FormatINROptions { symbol?: string; decimals?: number; }
-export interface LangOptions { lang?: 'en' | 'hi'; extended?: boolean; }
+export interface LangOptions { lang?: 'en' | 'hi' | 'mr' | 'gu' | 'ta' | 'bn'; extended?: boolean; }
 
 export interface ParsedGSTIN {
   gstin: string; stateCode: string; state: string; pan: string; entityNumber: string; checkChar: string;
@@ -31,7 +31,10 @@ export interface GSTOptions { inclusive?: boolean; interState?: boolean; }
 export interface PIIMatch { type: 'gstin' | 'aadhaar' | 'pan' | 'mobile' | 'email' | 'upi' | 'passport' | 'voterid' | 'card' | 'bankaccount' | 'ifsc'; value: string; start: number; end: number; }
 export interface PIIOptions { types?: Array<PIIMatch['type']>; exclude?: Array<PIIMatch['type']>; }
 
-export type SchemaRule = ValidatableType | { type: ValidatableType; required?: boolean; label?: string };
+export type SchemaRule = ValidatableType | { type: ValidatableType; required?: boolean; label?: string;
+  custom?: (value: string | number, normalized: string) => boolean | string;
+  message?: string | { en?: string; hi?: string };
+};
 export interface ValidationResult<T extends string = string> {
   valid: boolean;
   errors: Partial<Record<T, string>>;
@@ -73,12 +76,12 @@ export const VEHICLE_STATES: Record<string, string>;
 
 // Money
 export function formatINR(amount: number | string, options?: FormatINROptions): string;
-export function formatCompactINR(amount: number | string, options?: { symbol?: string }): string;
+export function formatCompactINR(amount: number | string, options?: FormatINROptions): string;
 export function parseINR(input: string | number): number | null;
 export function numberToWords(value: number, options?: LangOptions): string;
 export function amountInWords(amount: number | string, options?: LangOptions): string;
-export function numberToWordsHindi(value: number): string;
-export function amountInWordsHindi(amount: number | string): string;
+export function numberToWordsHindi(value: number, options?: { extended?: boolean }): string;
+export function amountInWordsHindi(amount: number | string, options?: { extended?: boolean }): string;
 export function calculateGST(amount: number, rate?: number, options?: GSTOptions): GSTBreakup;
 
 // Dates
@@ -109,3 +112,31 @@ export const SUPPORTED_TYPES: ValidatableType[];
 
 declare const bharat: typeof import('./index');
 export default bharat;
+
+export const GST_RATES: readonly number[];
+export const LEGACY_GST_RATES: readonly number[];
+export interface TDSSection { description: string; rate: number; threshold: number; }
+export const TDS_SECTIONS: Record<string, TDSSection[]>;
+export function isHSN(value: string | number): boolean;
+export function isSAC(value: string | number): boolean;
+export interface TDSOptions { hasPAN?: boolean; threshold?: number; }
+export interface TDSBreakup { amount: number; rate: number; tds: number; net: number; }
+export function calculateTDS(amount: number, rate: number, options?: TDSOptions): TDSBreakup;
+export interface IncomeTaxOptions {
+  fy?: string;
+  regime?: 'new' | 'old';
+  slabs?: readonly (readonly [upTo: number, rate: number])[];
+  standardDeduction?: number;
+  rebate?: { threshold: number; max: number; marginalRelief?: boolean } | null;
+  cess?: number;
+}
+export interface IncomeTaxBreakup {
+  taxableIncome: number; standardDeduction: number; tax: number; rebate: number; cess: number; total: number;
+  slabs: { from: number; upTo: number; rate: number; taxable: number; tax: number }[];
+}
+export function calculateIncomeTax(income: number, options?: IncomeTaxOptions): IncomeTaxBreakup;
+
+export type DueDateType = 'gstr-1' | 'gstr-3b' | 'tds-deposit' | 'tds-return' | 'advance-tax';
+export function quarterOf(date?: Date | string | number): 1 | 2 | 3 | 4;
+export function isLeapFY(labelOrDate?: Date | string | number): boolean;
+export function dueDates(fyLabel: string, options: { type: DueDateType }): Date[];
