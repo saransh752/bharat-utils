@@ -16,7 +16,7 @@ function createLanguage({ below100, hundred, scales, minus, rupees, paise, conju
 
   function numberToWords(value) {
     const n = Math.trunc(Number(value));
-    if (!Number.isSafeInteger(n)) throw new RangeError('Number out of range');
+    if (!Number.isSafeInteger(n) || Math.abs(n) >= 1e15) throw new RangeError('Number out of range');
     return (n < 0 ? minus + ' ' : '') + positive(Math.abs(n));
   }
 

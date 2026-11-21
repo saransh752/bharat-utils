@@ -174,3 +174,15 @@ test('tax year 2026-27 carries forward the 2025-26 rules in both regimes', () =>
     }
   }
 });
+
+test('regional wording supports magnitudes below 1e15', () => {
+  for (const lang of ['mr', 'gu', 'ta', 'bn']) {
+    for (const wording of [b.numberToWords, b.amountInWords]) {
+      for (const sign of [-1, 1]) {
+        assert.equal(typeof wording(sign * (1e15 - 1), { lang }), 'string');
+        assert.throws(() => wording(sign * 1e15, { lang }), RangeError);
+        assert.throws(() => wording(sign * (1e15 + 1), { lang, extended: true }), RangeError);
+      }
+    }
+  }
+});
