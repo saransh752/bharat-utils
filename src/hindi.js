@@ -1,5 +1,7 @@
 'use strict';
 
+const { splitAmount } = require('./_num');
+
 const H = ['शून्य', 'एक', 'दो', 'तीन', 'चार', 'पाँच', 'छह', 'सात', 'आठ', 'नौ', 'दस',
   'ग्यारह', 'बारह', 'तेरह', 'चौदह', 'पंद्रह', 'सोलह', 'सत्रह', 'अठारह', 'उन्नीस', 'बीस',
   'इक्कीस', 'बाईस', 'तेईस', 'चौबीस', 'पच्चीस', 'छब्बीस', 'सत्ताईस', 'अट्ठाईस', 'उनतीस', 'तीस',
@@ -21,14 +23,17 @@ function below1000(n) {
 }
 
 /** Integer to Hindi words using the Indian system (हज़ार, लाख, करोड़). */
-function numberToWordsHindi(value) {
+function numberToWordsHindi(value, options = {}) {
   const num = Number(value);
   if (!Number.isFinite(num)) throw new RangeError('Number out of range');
   let n = Math.trunc(Math.abs(num));
   if (n > Number.MAX_SAFE_INTEGER) throw new RangeError('Number out of range');
+  if (!options.extended && n >= 1e15) throw new RangeError('Use { extended: true } for numbers at or above 1e15');
   if (n === 0) return H[0];
   const parts = [];
-  for (const [size, name] of [[10000000, 'करोड़'], [100000, 'लाख'], [1000, 'हज़ार']]) {
+  const scales = [[1e7, 'करोड़'], [1e5, 'लाख'], [1e3, 'हज़ार']];
+  if (options.extended) scales.unshift([1e15, 'पद्म'], [1e13, 'नील'], [1e11, 'खरब'], [1e9, 'अरब']);
+  for (const [size, name] of scales) {
     const q = Math.floor(n / size);
     if (q) {
       parts.push((size === 10000000 ? numberToWordsHindi(q) : H[q]) + ' ' + name);
@@ -40,15 +45,16 @@ function numberToWordsHindi(value) {
 }
 
 /** Cheque-style amount in Hindi: "एक हज़ार दो सौ पचास रुपये और पचास पैसे मात्र" */
-function amountInWordsHindi(amount) {
+function amountInWordsHindi(amount, options) {
   const n = Number(amount);
   if (!Number.isFinite(n)) throw new TypeError('amountInWords expects a finite number');
-  const total = Math.round(Math.abs(n) * 100);
-  const rupees = Math.floor(total / 100);
-  const paise = total % 100;
-  let out = numberToWordsHindi(rupees) + ' रुपये';
-  if (paise) out += ' और ' + H[paise] + ' पैसे';
-  return (n < 0 ? 'ऋण ' : '') + out + ' मात्र';
+  const [rupees, paise] = splitAmount(n);
+  const cents = paise ? H[paise] + (paise === 1 ? ' पैसा' : ' पैसे') : '';
+  const whole = rupees || !paise
+    ? numberToWordsHindi(rupees, options) + (rupees === 1 ? ' रुपया' : ' रुपये')
+    : '';
+  const out = [whole, cents].filter(Boolean).join(' और ');
+  return (n < 0 && (rupees || paise) ? 'ऋण ' : '') + out + ' मात्र';
 }
 
 module.exports = { numberToWordsHindi, amountInWordsHindi };

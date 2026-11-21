@@ -15,14 +15,14 @@ const mask = require('./mask');
 const pii = require('./pii');
 const { detectType } = require('./detect');
 const { validateData } = require('./schema');
-const { registry, TYPES } = require('./registry');
+const { getEntry, TYPES } = require('./registry');
 
 /**
  * Validates any supported ID type by name.
  *   validate('pan', 'ABCPE1234F') -> true
  */
 function validate(type, value) {
-  const entry = registry[String(type).toLowerCase()];
+  const entry = getEntry(type);
   if (!entry) throw new Error(`Unknown type "${type}". Supported: ${TYPES.join(', ')}`);
   return entry.test(value);
 }

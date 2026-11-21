@@ -3,7 +3,7 @@ export type ValidatableType =
   | 'voterid' | 'passport' | 'dl' | 'tan' | 'cin' | 'udyam' | 'upi';
 
 export interface FormatINROptions { symbol?: string; decimals?: number; }
-export interface LangOptions { lang?: 'en' | 'hi'; }
+export interface LangOptions { lang?: 'en' | 'hi'; extended?: boolean; }
 
 export interface ParsedGSTIN {
   gstin: string; stateCode: string; state: string; pan: string; entityNumber: string; checkChar: string;
@@ -21,6 +21,7 @@ export interface FinancialYearInfo {
   quarter: 1 | 2 | 3 | 4; start: Date; end: Date;
 }
 export interface ParsedFinancialYear {
+  assessmentYear: string;
   startYear: number; endYear: number; label: string; start: Date; end: Date;
 }
 export interface GSTBreakup {

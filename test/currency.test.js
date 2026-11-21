@@ -30,6 +30,6 @@ test('numberToWords uses the Indian system', () => {
 test('amountInWords handles paise and rounding', () => {
   assert.strictEqual(amountInWords(1250.5), 'Rupees One Thousand Two Hundred Fifty and Fifty Paise Only');
   assert.strictEqual(amountInWords(100), 'Rupees One Hundred Only');
-  assert.strictEqual(amountInWords(0.99), 'Rupees Zero and Ninety Nine Paise Only');
+  assert.strictEqual(amountInWords(0.99), 'Ninety Nine Paise Only');
   assert.strictEqual(amountInWords(-10), 'Minus Rupees Ten Only');
 });

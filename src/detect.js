@@ -1,6 +1,6 @@
 'use strict';
 
-const { registry } = require('./registry');
+const { getEntry, TYPES } = require('./registry');
 
 /**
  * Figures out what kind of Indian ID a string could be.
@@ -11,7 +11,7 @@ const { registry } = require('./registry');
  */
 function detectType(value) {
   if (value == null || String(value).trim() === '') return [];
-  return Object.keys(registry).filter((type) => registry[type].test(value));
+  return TYPES.filter((type) => getEntry(type).test(value));
 }
 
 module.exports = { detectType };

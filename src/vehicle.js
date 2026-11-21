@@ -8,7 +8,7 @@ const VEHICLE_STATES = {
   LD: 'Lakshadweep', MH: 'Maharashtra', ML: 'Meghalaya', MN: 'Manipur', MP: 'Madhya Pradesh',
   MZ: 'Mizoram', NL: 'Nagaland', OD: 'Odisha', OR: 'Odisha (old code)', PB: 'Punjab',
   PY: 'Puducherry', RJ: 'Rajasthan', SK: 'Sikkim', TN: 'Tamil Nadu', TR: 'Tripura',
-  TS: 'Telangana', UA: 'Uttarakhand (old code)', UK: 'Uttarakhand', UP: 'Uttar Pradesh', WB: 'West Bengal',
+  TG: 'Telangana', TS: 'Telangana', UA: 'Uttarakhand (old code)', UK: 'Uttarakhand', UP: 'Uttar Pradesh', WB: 'West Bengal',
 };
 
 const clean = (v) => String(v == null ? '' : v).toUpperCase().replace(/[\s-]/g, '');

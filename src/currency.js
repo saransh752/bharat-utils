@@ -2,14 +2,28 @@
 
 const { numberToWordsHindi, amountInWordsHindi } = require('./hindi');
 
+const { roundTo, splitAmount } = require('./_num');
+
+function formatNumber(amount, decimals) {
+  if (typeof amount !== 'number' && (typeof amount !== 'string' || !amount.trim())) {
+    throw new TypeError('Expected a finite number');
+  }
+  const n = Number(amount);
+  if (!Number.isFinite(n)) throw new TypeError('Expected a finite number');
+  if (Math.abs(n) >= 1e21) throw new RangeError('Amount must be below 1e21');
+  if (!Number.isInteger(decimals) || decimals < 0 || decimals > 20) {
+    throw new RangeError('decimals must be an integer between 0 and 20');
+  }
+  return n;
+}
+
 /**
  * Formats a number in the Indian digit-grouping system.
  *   formatINR(1234567.5) -> "₹12,34,567.50"
  */
 function formatINR(amount, options = {}) {
   const { symbol = '₹', decimals = 2 } = options;
-  const n = Number(amount);
-  if (!Number.isFinite(n)) throw new TypeError('formatINR expects a finite number');
+  const n = roundTo(formatNumber(amount, decimals), decimals);
   const negative = n < 0;
   const [intPart, decPart] = Math.abs(n).toFixed(decimals).split('.');
   let grouped;
@@ -27,17 +41,16 @@ function formatINR(amount, options = {}) {
  * Compact Indian style: 1250000 -> "₹12.5 L", 15000000 -> "₹1.5 Cr", 25000 -> "₹25 K".
  */
 function formatCompactINR(amount, options = {}) {
-  const { symbol = '₹' } = options;
-  const n = Number(amount);
-  if (!Number.isFinite(n)) throw new TypeError('formatCompactINR expects a finite number');
+  const { symbol = '₹', decimals = 2 } = options;
+  const n = formatNumber(amount, decimals);
   const abs = Math.abs(n);
-  const trim = (v) => Number(v.toFixed(2)).toString();
+  const trim = (v) => roundTo(v, decimals).toString();
   let body;
   if (abs >= 1e7) body = trim(abs / 1e7) + ' Cr';
   else if (abs >= 1e5) body = trim(abs / 1e5) + ' L';
   else if (abs >= 1e3) body = trim(abs / 1e3) + ' K';
   else body = trim(abs);
-  return (n < 0 ? '-' : '') + symbol + body;
+  return (n < 0 && body !== '0' ? '-' : '') + symbol + body;
 }
 
 /**
@@ -51,7 +64,7 @@ function parseINR(input) {
   if (typeof input === 'number') return Number.isFinite(input) ? input : null;
   let s = String(input == null ? '' : input).trim().toLowerCase();
   s = s.replace(/^(-?)\s*(?:₹|rs\.?|inr)\s*/, '$1').replace(/,/g, '').trim();
-  const m = /^(-?\d*\.?\d+)\s*(k|thousand|l|lac|lacs|lakh|lakhs|cr|crore|crores)?$/.exec(s);
+  const m = /^(-?(?:\d*\.\d+|\d+))\s*(k|thousand|l|lac|lacs|lakh|lakhs|cr|crore|crores)?$/.exec(s);
   if (!m) return null;
   const mult = { k: 1e3, thousand: 1e3, l: 1e5, lac: 1e5, lacs: 1e5, lakh: 1e5, lakhs: 1e5, cr: 1e7, crore: 1e7, crores: 1e7 };
   return Number((Number(m[1]) * (m[2] ? mult[m[2]] : 1)).toFixed(2));
@@ -74,14 +87,17 @@ function below1000(n) {
  * Integer to words in the Indian system. Pass { lang: 'hi' } for Hindi.
  */
 function numberToWords(value, options = {}) {
-  if (options.lang === 'hi') return numberToWordsHindi(value);
+  if (options.lang === 'hi') return numberToWordsHindi(value, options);
   const num = Number(value);
   if (!Number.isFinite(num)) throw new RangeError('Number out of range');
   let n = Math.trunc(Math.abs(num));
   if (n > Number.MAX_SAFE_INTEGER) throw new RangeError('Number out of range');
+  if (!options.extended && n >= 1e15) throw new RangeError('Use { extended: true } for numbers at or above 1e15');
   if (n === 0) return 'Zero';
   const parts = [];
-  for (const [size, name] of [[10000000, 'Crore'], [100000, 'Lakh'], [1000, 'Thousand']]) {
+  const scales = [[1e7, 'Crore'], [1e5, 'Lakh'], [1e3, 'Thousand']];
+  if (options.extended) scales.unshift([1e15, 'Padma'], [1e13, 'Neel'], [1e11, 'Kharab'], [1e9, 'Arab']);
+  for (const [size, name] of scales) {
     const q = Math.floor(n / size);
     if (q) {
       parts.push((size === 10000000 ? numberToWords(q) : below100(q)) + ' ' + name);
@@ -97,18 +113,17 @@ function numberToWords(value, options = {}) {
  *   amountInWords(1250.5) -> "Rupees One Thousand Two Hundred Fifty and Fifty Paise Only"
  */
 function amountInWords(amount, options = {}) {
-  if (options.lang === 'hi') return amountInWordsHindi(amount);
+  if (options.lang === 'hi') return amountInWordsHindi(amount, options);
   const n = Number(amount);
   if (!Number.isFinite(n)) throw new TypeError('amountInWords expects a finite number');
-  const total = Math.round(Math.abs(n) * 100);
-  const rupees = Math.floor(total / 100);
-  const paise = total % 100;
-  let out = 'Rupees ' + numberToWords(rupees);
-  if (paise) out += ' and ' + below100(paise) + ' Paise';
-  return (n < 0 ? 'Minus ' : '') + out + ' Only';
+  const [rupees, paise] = splitAmount(n);
+  const cents = paise ? below100(paise) + (paise === 1 ? ' Paisa' : ' Paise') : '';
+  const whole = rupees || !paise ? 'Rupees ' + numberToWords(rupees, options) : '';
+  const out = [whole, cents].filter(Boolean).join(' and ');
+  return (n < 0 && (rupees || paise) ? 'Minus ' : '') + out + ' Only';
 }
 
-const r2 = (x) => Math.round((x + Number.EPSILON) * 100) / 100;
+const r2 = (x) => roundTo(x, 2);
 
 /**
  * GST calculator for invoices.
@@ -119,6 +134,7 @@ const r2 = (x) => Math.round((x + Number.EPSILON) * 100) / 100;
 function calculateGST(amount, rate = 18, options = {}) {
   const { inclusive = false, interState = false } = options;
   const a = Number(amount);
+  if (rate === null || (typeof rate === 'string' && !rate.trim())) throw new TypeError('rate must be a number');
   const rt = Number(rate);
   if (!Number.isFinite(a) || a < 0) throw new TypeError('amount must be a non-negative number');
   if (!Number.isFinite(rt) || rt < 0 || rt > 100) throw new RangeError('rate must be between 0 and 100');

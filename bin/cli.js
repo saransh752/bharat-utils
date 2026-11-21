@@ -40,7 +40,7 @@ function readStdin() {
     } else if (cmd === 'detect' && rest[0]) {
       const t = b.detectType(rest.join(' '));
       console.log(t.length ? t.join(', ') : 'unknown');
-    } else if (cmd === 'redact') {
+    } else if (cmd === 'redact' && (rest.length || !process.stdin.isTTY)) {
       const text = rest.length ? rest.join(' ') : await readStdin();
       process.stdout.write(b.redactPII(text) + (rest.length ? '\n' : ''));
     } else if (cmd === 'format' && rest[0]) {
@@ -56,6 +56,7 @@ function readStdin() {
       console.log(`Financial Year: ${f.label} | Assessment Year: ${f.assessmentYear} | Quarter: Q${f.quarter}`);
     } else {
       console.log(help);
+      if (cmd && !['--help', '-h', 'help', 'redact'].includes(cmd)) process.exitCode = 2;
     }
   } catch (e) {
     console.error('Error:', e.message);

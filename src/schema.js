@@ -1,8 +1,8 @@
 'use strict';
 
-const { registry } = require('./registry');
+const { getEntry } = require('./registry');
 
-const isEmpty = (v) => v === undefined || v === null || String(v).trim() === '';
+const isEmpty = (v) => v === undefined || v === null || (typeof v === 'string' && v.trim() === '');
 
 function message(kind, lang, label) {
   if (lang === 'hi') return kind === 'required' ? `${label} आवश्यक है` : `अमान्य ${label}`;
@@ -29,7 +29,7 @@ function validateData(input, schema, options = {}) {
 
   for (const [field, rule] of Object.entries(schema || {})) {
     const spec = typeof rule === 'string' ? { type: rule } : rule || {};
-    const entry = registry[String(spec.type).toLowerCase()];
+    const entry = getEntry(spec.type);
     if (!entry) throw new Error(`Unknown type "${spec.type}" for field "${field}"`);
     const label = spec.label || entry[lang];
     const value = data[field];
@@ -38,7 +38,7 @@ function validateData(input, schema, options = {}) {
       if (spec.required !== false) errors[field] = message('required', lang, label);
       continue;
     }
-    if (!entry.test(value)) {
+    if (typeof value === 'object' || !entry.test(value)) {
       errors[field] = message('invalid', lang, label);
       continue;
     }

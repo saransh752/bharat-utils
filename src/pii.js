@@ -12,7 +12,7 @@ const DETECTORS = [
   { type: 'aadhaar', re: /\b[2-9]\d{3}[ -]?\d{4}[ -]?\d{4}\b/g, ok: isAadhaar, mask: (s) => maskKeepLast(s, 4) },
   { type: 'pan', re: /\b[A-Z]{5}\d{4}[A-Z]\b/gi, ok: isPAN, mask: (s) => maskKeepLast(s, 4) },
   { type: 'mobile', re: /(?<!\d)(?:\+91[ -]?|91[ -]?|0)?[6-9]\d{4}[ -]?\d{5}(?!\d)/g, ok: isMobile, mask: (s) => maskKeepLast(s, 4) },
-  { type: 'email', re: /[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/g, ok: () => true, mask: maskEmail },
+  { type: 'email', re: /(?<![A-Za-z0-9._%+-])[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/g, ok: () => true, mask: maskEmail },
 ];
 
 /**
@@ -24,6 +24,7 @@ function findPII(text, options = {}) {
   const s = String(text == null ? '' : text);
   const wanted = options.types ? new Set(options.types) : null;
   const taken = [];
+  const occupied = new Uint8Array(s.length);
   for (const d of DETECTORS) {
     if (wanted && !wanted.has(d.type)) continue;
     d.re.lastIndex = 0;
@@ -32,7 +33,8 @@ function findPII(text, options = {}) {
       const start = m.index;
       const end = start + m[0].length;
       if (!d.ok(m[0])) continue;
-      if (taken.some((t) => start < t.end && end > t.start)) continue;
+      if (occupied.subarray(start, end).includes(1)) continue;
+      occupied.fill(1, start, end);
       taken.push({ type: d.type, value: m[0], start, end });
     }
   }

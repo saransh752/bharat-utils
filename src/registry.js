@@ -31,4 +31,9 @@ const registry = {
   upi: { test: ids.isUPI, normalize: (v) => String(v).trim().toLowerCase(), en: 'UPI ID', hi: 'यूपीआई आईडी' },
 };
 
-module.exports = { registry, TYPES: Object.keys(registry) };
+function getEntry(type) {
+  const key = String(type).toLowerCase();
+  return Object.hasOwn(registry, key) ? registry[key] : undefined;
+}
+
+module.exports = { getEntry, TYPES: Object.keys(registry) };

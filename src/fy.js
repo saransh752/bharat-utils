@@ -3,6 +3,15 @@
 const pad2 = (n) => String(n % 100).padStart(2, '0');
 
 function toDate(input) {
+  if (input === null) throw new TypeError('Invalid date');
+  if (typeof input === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(input)) {
+    const [year, month, day] = input.split('-').map(Number);
+    const local = new Date(0);
+    local.setFullYear(year, month - 1, day);
+    local.setHours(0, 0, 0, 0);
+    if (local.getMonth() !== month - 1 || local.getDate() !== day) throw new TypeError('Invalid date');
+    return local;
+  }
   const d = input === undefined ? new Date() : new Date(input);
   if (Number.isNaN(d.getTime())) throw new TypeError('Invalid date');
   return d;
@@ -39,6 +48,7 @@ function parseFinancialYear(label) {
     startYear,
     endYear: startYear + 1,
     label: `${startYear}-${m[2]}`,
+    assessmentYear: `${startYear + 1}-${pad2(startYear + 2)}`,
     start: new Date(startYear, 3, 1),
     end: new Date(startYear + 1, 2, 31, 23, 59, 59, 999),
   };
