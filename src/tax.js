@@ -7,7 +7,10 @@ const taxSlabs = require('./data/tax-slabs');
 const GST_RATES = Object.freeze([0, 0.25, 3, 5, 18, 40]);
 const LEGACY_GST_RATES = Object.freeze([12, 28]);
 
-// Indicative historical section references. Verify with the Income Tax Department.
+// The Income-tax Act, 2025 applies from 1 April 2026. It replaces the
+// assessment year and previous year terminology with tax year and renumbers
+// TDS provisions. These section numbers are historical references under the
+// 1961 Act. Verify current provisions against the 2025 Act.
 // Thresholds refer to annual totals unless otherwise stated.
 const TDS_SECTIONS = {
   '194C': [

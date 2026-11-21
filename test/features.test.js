@@ -163,3 +163,14 @@ test('CLI new commands and language flag run in real subprocesses', () => {
   assert.equal(cli(0, 'words', '--lang', 'gu', '0.5'), 'પચાસ પૈસા માત્ર');
   cli(2, 'words', '1', '--lang');
 });
+
+test('tax year 2026-27 carries forward the 2025-26 rules in both regimes', () => {
+  for (const regime of ['new', 'old']) {
+    for (const income of [550000, 550001, 1275000, 1276000, 3000000]) {
+      assert.deepEqual(
+        b.calculateIncomeTax(income, { fy: '2026-27', regime }),
+        b.calculateIncomeTax(income, { fy: '2025-26', regime }),
+      );
+    }
+  }
+});

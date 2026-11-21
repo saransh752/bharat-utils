@@ -149,7 +149,13 @@ are arrays of examples by payment category, with rates and thresholds for
 FY 2025–26. Some statutory thresholds apply to aggregated payments or to
 the excess above a limit.
 
-The bundled FY 2025–26 income tax estimates cover ordinary slab-rate income
+The Income-tax Act, 2025 applies from 1 April 2026. It replaces the terms
+assessment year and previous year with tax year and renumbers TDS provisions.
+Use the historical section numbers in `TDS_SECTIONS` as references to the
+1961 Act and verify current provisions against the 2025 Act.
+[Income Tax Department guidance](https://www.incometax.gov.in/iec/foportal/help/all-topics/e-filing-services/tax-payments-faq)
+
+The bundled income tax estimates for FY 2025–26 and tax year 2026–27 cover ordinary slab-rate income
 for a resident individual under 60. The default deduction assumes qualifying
 salary or pension income. Set `standardDeduction: 0` when inapplicable. Pass
 `rebate: null` when ineligible. The estimate covers slab tax, configured rebate
