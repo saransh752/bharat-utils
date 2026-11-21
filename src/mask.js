@@ -23,4 +23,19 @@ function maskEmail(value) {
   return s[0] + '***' + s.slice(at);
 }
 
-module.exports = { maskKeepLast, maskPAN, maskGSTIN, maskMobile, maskEmail };
+function maskUPI(value) {
+  const s = String(value == null ? '' : value);
+  const at = s.lastIndexOf('@');
+  if (at < 1) return s;
+  return s.slice(0, Math.min(2, at - 1)) + '***' + s.slice(at);
+}
+
+const maskPassport = (v) => maskKeepLast(v, 4);
+const maskVoterId = (v) => maskKeepLast(v, 4);
+const maskCard = (v) => maskKeepLast(v, 4);
+const maskBankAccount = (v) => maskKeepLast(v, 4);
+
+module.exports = {
+  maskKeepLast, maskPAN, maskGSTIN, maskMobile, maskEmail, maskUPI,
+  maskPassport, maskVoterId, maskCard, maskBankAccount,
+};

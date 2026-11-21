@@ -13,6 +13,8 @@ const inputs = {
   base64: 'aBcdEF29+/'.repeat(20000),
   noTLD: 'a@' + 'a'.repeat(199998),
   dense: 'abc@example.com '.repeat(12500),
+  accountWhitespace: 'account' + ' '.repeat(199993),
+  separatedDigits: '4-'.repeat(100000),
 };
 
 for (const [shape, input] of Object.entries(inputs)) {

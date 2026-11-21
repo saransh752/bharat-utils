@@ -28,8 +28,8 @@ export interface GSTBreakup {
   base: number; rate: number; cgst: number; sgst: number; igst: number; totalTax: number; total: number;
 }
 export interface GSTOptions { inclusive?: boolean; interState?: boolean; }
-export interface PIIMatch { type: 'gstin' | 'aadhaar' | 'pan' | 'mobile' | 'email'; value: string; start: number; end: number; }
-export interface PIIOptions { types?: Array<PIIMatch['type']>; }
+export interface PIIMatch { type: 'gstin' | 'aadhaar' | 'pan' | 'mobile' | 'email' | 'upi' | 'passport' | 'voterid' | 'card' | 'bankaccount' | 'ifsc'; value: string; start: number; end: number; }
+export interface PIIOptions { types?: Array<PIIMatch['type']>; exclude?: Array<PIIMatch['type']>; }
 
 export type SchemaRule = ValidatableType | { type: ValidatableType; required?: boolean; label?: string };
 export interface ValidationResult<T extends string = string> {
@@ -91,6 +91,11 @@ export function maskPAN(value: string): string;
 export function maskGSTIN(value: string): string;
 export function maskMobile(value: string): string;
 export function maskEmail(value: string): string;
+export function maskUPI(value: string): string;
+export function maskPassport(value: string): string;
+export function maskVoterId(value: string): string;
+export function maskCard(value: string): string;
+export function maskBankAccount(value: string): string;
 export function findPII(text: string, options?: PIIOptions): PIIMatch[];
 export function redactPII(text: string, options?: PIIOptions): string;
 
