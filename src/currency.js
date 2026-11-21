@@ -136,6 +136,9 @@ const r2 = (x) => roundTo(x, 2);
  */
 function calculateGST(amount, rate = 18, options = {}) {
   const { inclusive = false, interState = false } = options;
+  if (typeof amount !== 'number' && (typeof amount !== 'string' || !amount.trim())) {
+    throw new TypeError('amount must be a non-negative number');
+  }
   const a = Number(amount);
   if (rate === null || (typeof rate === 'string' && !rate.trim())) throw new TypeError('rate must be a number');
   const rt = Number(rate);

@@ -55,3 +55,11 @@ test('financial year', () => {
   assert.strictEqual(b.parseFinancialYear('2026-28'), null);
   assert.strictEqual(b.parseFinancialYear('junk'), null);
 });
+
+test('calculateGST requires a number or a nonblank numeric string', () => {
+  for (const value of [null, undefined, true, false, [], [100], '', ' \t\n', 'invalid']) {
+    assert.throws(() => b.calculateGST(value), TypeError);
+  }
+  assert.deepStrictEqual(b.calculateGST(' 100.50 '), b.calculateGST(100.5));
+  assert.deepStrictEqual(b.calculateGST('0'), b.calculateGST(0));
+});
