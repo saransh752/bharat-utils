@@ -10,6 +10,8 @@ const inputs = {
   atSigns: 'a@'.repeat(100000),
   dots: 'a.'.repeat(100000),
   spacedDigits: '1 '.repeat(100000),
+  repeatedFourDigitGroups: '4111-'.repeat(40000),
+  repeatedCardGroups: '4111111111111111 '.repeat(11765).slice(0, 200000),
   base64: 'aBcdEF29+/'.repeat(20000),
   noTLD: 'a@' + 'a'.repeat(199998),
   dense: 'abc@example.com '.repeat(12500),

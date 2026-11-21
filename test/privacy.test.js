@@ -88,3 +88,22 @@ test('overlapping masks cannot expose a fresh identifier on a second redaction',
   assert.strictEqual(redacted, 'X***@example.com + r***@test-XXXXXX3210.com');
   assert.strictEqual(b.redactPII(redacted), redacted);
 });
+
+test('card detection checks windows of complete digit groups', () => {
+  const cases = [
+    ['qty 2 4111111111111111', ['4111111111111111']],
+    ['amount 500 4111 1111 1111 1111', ['4111 1111 1111 1111']],
+    ['4111111111111111 4111111111111111', ['4111111111111111', '4111111111111111']],
+    ['qty 2-4111111111111111', ['4111111111111111']],
+    ['0000 0000 0000 0000 000', ['0000 0000 0000 0000 000']],
+  ];
+  for (const [text, cards] of cases) {
+    const matches = b.findPII(text, { types: ['card'] });
+    assert.deepStrictEqual(matches.map(({ value }) => value), cards);
+    for (const { value, start, end } of matches) assert.strictEqual(text.slice(start, end), value);
+  }
+  assert.strictEqual(b.redactPII(cases[2][0]), 'XXXXXXXXXXXX1111 XXXXXXXXXXXX1111');
+  for (const text of ['4111111111111112', 'order ID 1234567890123456', 'order ID 14111111111111111111']) {
+    assert.strictEqual(b.redactPII(text, { types: ['card'] }), text);
+  }
+});

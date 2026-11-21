@@ -21,13 +21,46 @@ function isCard(value) {
   return sum % 10 === 0;
 }
 
+function* cardMatches(text, occupied) {
+  const groups = /\d+/g;
+  const window = [];
+  let group = groups.exec(text);
+  while (group || window.length) {
+    if (!window.length) {
+      window.push(group);
+      group = groups.exec(text);
+    }
+    const first = window[0];
+    let digits = 0;
+    let end = first.index;
+    let bestEnd = end;
+    // Look ahead at most 19 groups because each contributes at least one digit.
+    for (let i = 0; i < 19; i++) {
+      const next = window[i] || group;
+      if (!next || digits + next[0].length > 19) break;
+      if (i && (next.index !== end + 1 || !/[ -]/.test(text[end]))) break;
+      const nextEnd = next.index + next[0].length;
+      if (occupied.subarray(next.index, nextEnd).includes(1)) break;
+      if (!window[i]) {
+        window.push(next);
+        group = groups.exec(text);
+      }
+      digits += next[0].length;
+      end = nextEnd;
+      if (digits >= 13 && isCard(text.slice(first.index, end))) bestEnd = end;
+    }
+    if (bestEnd > first.index) yield { start: first.index, end: bestEnd };
+    window.shift();
+  }
+}
+
 const isBankAccount = (value) => /^\d{9,18}$/.test(value);
 const maskLast4 = (value) => maskKeepLast(value, 4);
 
 // Priority order matters: earlier types win when matches overlap.
 const DETECTORS = [
   { type: 'gstin', re: /\b\d{2}[A-Z]{5}\d{4}[A-Z][1-9A-Z]Z[0-9A-Z]\b/gi, ok: isGSTIN, mask: maskLast4 },
-  { type: 'card', re: /(?<!\d[ -]?)(?:\d[ -]?){12,18}\d(?![ -]?\d)/g, ok: isCard, mask: maskCard },
+  { type: 'card', mask: maskCard },
   { type: 'aadhaar', re: /\b[2-9]\d{3}[ -]?\d{4}[ -]?\d{4}\b/g, ok: isAadhaar, mask: maskLast4 },
   { type: 'pan', re: /\b[A-Z]{5}\d{4}[A-Z]\b/gi, ok: isPAN, mask: maskLast4 },
   { type: 'email', re: /(?<![A-Za-z0-9._%+-])[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/g, ok: () => true, mask: maskEmail },
@@ -58,6 +91,13 @@ function findPII(text, options = {}) {
   const occupied = new Uint8Array(s.length);
   for (const d of DETECTORS) {
     if (excluded.has(d.type) || (wanted ? !wanted.has(d.type) : d.type === 'ifsc')) continue;
+    if (d.type === 'card') {
+      for (const { start, end } of cardMatches(s, occupied)) {
+        occupied.fill(1, start, end);
+        taken.push({ type: d.type, value: s.slice(start, end), start, end });
+      }
+      continue;
+    }
     d.re.lastIndex = 0;
     let m;
     while ((m = d.re.exec(s)) !== null) {
