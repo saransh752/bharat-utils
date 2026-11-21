@@ -23,34 +23,34 @@ function isCard(value) {
 
 function* cardMatches(text, occupied) {
   const groups = /\d+/g;
-  const window = [];
-  let group = groups.exec(text);
-  while (group || window.length) {
-    if (!window.length) {
-      window.push(group);
-      group = groups.exec(text);
-    }
-    const first = window[0];
-    let digits = 0;
-    let end = first.index;
-    let bestEnd = end;
-    // Look ahead at most 19 groups because each contributes at least one digit.
-    for (let i = 0; i < 19; i++) {
-      const next = window[i] || group;
-      if (!next || digits + next[0].length > 19) break;
-      if (i && (next.index !== end + 1 || !/[ -]/.test(text[end]))) break;
-      const nextEnd = next.index + next[0].length;
-      if (occupied.subarray(next.index, nextEnd).includes(1)) break;
-      if (!window[i]) {
-        window.push(next);
-        group = groups.exec(text);
+  const groupedSuffix = /(?:[ -]\d{4}){3}(?!\d)([ -]\d{1,3}(?!\d))?|[ -]\d{6}[ -]\d{5}(?!\d)/y;
+  let group;
+  while ((group = groups.exec(text)) !== null) {
+    const start = group.index;
+    const size = group[0].length;
+    let end = groups.lastIndex;
+    if (size === 4) {
+      // A sticky match checks only the bounded suffix immediately after this group.
+      groupedSuffix.lastIndex = end;
+      const suffix = groupedSuffix.exec(text);
+      if (!suffix) continue;
+      end = groupedSuffix.lastIndex;
+      // Prefer the optional tail if the longer card passes validation.
+      if (suffix[1]) {
+        if (!occupied.subarray(start, end).includes(1) && isCard(text.slice(start, end))) {
+          groups.lastIndex = end;
+          yield { start, end };
+          continue;
+        }
+        end -= suffix[1].length;
       }
-      digits += next[0].length;
-      end = nextEnd;
-      if (digits >= 13 && isCard(text.slice(first.index, end))) bestEnd = end;
+    } else if (size < 13 || size > 19) {
+      continue;
     }
-    if (bestEnd > first.index) yield { start: first.index, end: bestEnd };
-    window.shift();
+
+    if (occupied.subarray(start, end).includes(1) || !isCard(text.slice(start, end))) continue;
+    groups.lastIndex = end;
+    yield { start, end };
   }
 }
 
