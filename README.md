@@ -121,7 +121,9 @@ console.log(b.numberToWords(1e15 + 1e13 + 1e11 + 1e9, { extended: true }));
 
 The formatters accept finite numbers and numeric strings with absolute value
 below 1e21. Use `decimals` from 0 through 20. English and Hindi require
-`extended: true` from 1e15 through `Number.MAX_SAFE_INTEGER`.
+`extended: true` from 1e15 through `Number.MAX_SAFE_INTEGER`. Marathi, Gujarati,
+Tamil, and Bengali wording is experimental, pending native-speaker review,
+and supports magnitudes below 1e15.
 
 ### GST, TDS, and income tax
 
@@ -384,8 +386,7 @@ Type signatures and result shapes are in [index.d.ts](./index.d.ts).
   · [Income Tax Department FY 2025–26 slabs](https://www.incometax.gov.in/iec/foportal/help/individual/return-applicable-1?mobile-app=1)
   · [Tax payment FAQ](https://www.incometax.gov.in/iec/foportal/help/all-topics/e-filing-services/tax-payments-faq)
 - **Translations.** Marathi, Gujarati, Tamil, and Bengali number and currency
-  wording is indicative and needs native-speaker review before it is used on
-  customer-facing invoices or cheques.
+  wording is experimental, pending native-speaker review.
 - **PII false positives.** An unlabelled 10-digit account number beginning with
   6–9 can look like a mobile number. Use `exclude: ['mobile']` on account-heavy
   text if that tradeoff suits your use case. Format overlaps and unknown formats

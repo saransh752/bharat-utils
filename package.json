@@ -1,6 +1,6 @@
 {
   "name": "bharat-utils",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Zero-dependency Indian ID validation, PII redaction, INR and tax helpers, financial-year tools, and web framework adapters.",
   "main": "src/index.js",
   "module": "index.mjs",

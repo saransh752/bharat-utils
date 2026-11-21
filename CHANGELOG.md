@@ -3,6 +3,23 @@
 This project follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 [Semantic Versioning](https://semver.org/).
 
+## [1.1.1] - 2026-11-21
+
+### Added
+
+- Income tax estimates for tax year 2026–27 using the same slabs, standard deductions, and rebates as FY 2025–26.
+
+### Fixed
+
+- Detect Luhn-valid cards next to other numbers separated by a single space or dash.
+- Redact identifiers adjacent to underscores.
+- Reject invalid GST amount types and blank strings.
+- Enforce a magnitude limit below 1e15 for Marathi, Gujarati, Tamil, and Bengali wording.
+
+### Known issues
+
+- Marathi, Gujarati, Tamil, and Bengali wording is experimental, pending native-speaker review.
+
 ## [1.1.0] - 2026-11-21
 
 ### Fixed
@@ -53,5 +70,6 @@ This project follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) an
 
 - Initial release.
 
+[1.1.1]: https://github.com/saransh752/bharat-utils/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/saransh752/bharat-utils/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/saransh752/bharat-utils/releases/tag/v1.0.0
