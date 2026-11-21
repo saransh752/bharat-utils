@@ -1,7 +1,7 @@
 {
   "name": "bharat-utils",
   "version": "1.1.0",
-  "description": "Privacy-first toolkit for Indian apps: validate 14 ID types (Aadhaar, PAN, GSTIN, vehicle, UPI...), redact PII from text, Hindi amount-in-words, lakh/crore formatting, GST calculator, financial-year helpers and Express middleware. Zero dependencies.",
+  "description": "Zero-dependency Indian ID validation, PII redaction, INR and tax helpers, financial-year tools, and web framework adapters.",
   "main": "src/index.js",
   "module": "index.mjs",
   "types": "index.d.ts",
@@ -37,10 +37,12 @@
     "README.md",
     "LICENSE",
     "fastify.d.ts",
-    "koa.d.ts"
+    "koa.d.ts",
+    "CHANGELOG.md"
   ],
   "scripts": {
-    "test": "node --test"
+    "test": "node --test",
+    "test:coverage": "node --test --experimental-test-coverage"
   },
   "keywords": [
     "india",

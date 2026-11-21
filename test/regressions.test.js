@@ -72,3 +72,19 @@ test('CLI distinguishes invalid input, usage errors and help', () => {
   assert.match(unknown.stdout, /Usage:/);
   assert.equal(cli('--help').status, 0);
 });
+
+test('CLI redact shows help when stdin is interactive and reads piped input', () => {
+  const entry = path.join(__dirname, '../bin/cli.js');
+  const interactive = spawnSync(process.execPath, ['-e', `
+    Object.defineProperty(process.stdin, 'isTTY', { value: true });
+    process.argv = [process.execPath, ${JSON.stringify(entry)}, 'redact'];
+    require(${JSON.stringify(entry)});
+  `], { encoding: 'utf8', timeout: 3000 });
+  assert.equal(interactive.status, 0);
+  assert.match(interactive.stdout, /Usage:/);
+  const piped = spawnSync(process.execPath, [entry, 'redact'], {
+    input: 'PAN ABCPE1234F', encoding: 'utf8', timeout: 3000,
+  });
+  assert.equal(piped.status, 0);
+  assert.equal(piped.stdout, 'PAN XXXXXX234F');
+});

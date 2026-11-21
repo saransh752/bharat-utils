@@ -79,16 +79,23 @@ function findPII(text, options = {}) {
  *   -> 'PAN XXXXXX234F, call XXXXX X3210'
  */
 function redactPII(text, options = {}) {
-  const s = String(text == null ? '' : text);
-  const found = findPII(s, options);
-  let out = '';
-  let cursor = 0;
-  for (const f of found) {
-    const det = DETECTORS.find((d) => d.type === f.type);
-    out += s.slice(cursor, f.start) + det.mask(f.value);
-    cursor = f.end;
+  let current = String(text == null ? '' : text);
+  // A high-priority mask can expose an overlapping lower-priority identifier.
+  // Every changing pass replaces original identifier characters with mask characters.
+  while (true) {
+    const found = findPII(current, options);
+    if (!found.length) return current;
+    let out = '';
+    let cursor = 0;
+    for (const f of found) {
+      const det = DETECTORS.find((d) => d.type === f.type);
+      out += current.slice(cursor, f.start) + det.mask(f.value);
+      cursor = f.end;
+    }
+    out += current.slice(cursor);
+    if (out === current) return current;
+    current = out;
   }
-  return out + s.slice(cursor);
 }
 
 module.exports = { findPII, redactPII };

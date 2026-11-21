@@ -80,3 +80,11 @@ test('PII exclusions, overlap priorities and invalid candidates', () => {
   assert.strictEqual(b.maskCard('4111 1111 1111 1111'), 'XXXX XXXX XXXX 1111');
   assert.strictEqual(b.maskBankAccount('123456789'), 'XXXXX6789');
 });
+
+test('overlapping masks cannot expose a fresh identifier on a second redaction', () => {
+  const text = 'ABCPE1234F@example.com + rahul@test-9876543210.com';
+  assert.deepStrictEqual(b.findPII(text).map(({ type }) => type), ['pan', 'email']);
+  const redacted = b.redactPII(text);
+  assert.strictEqual(redacted, 'X***@example.com + r***@test-XXXXXX3210.com');
+  assert.strictEqual(b.redactPII(redacted), redacted);
+});
